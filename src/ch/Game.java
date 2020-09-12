@@ -3,9 +3,17 @@ package ch;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferStrategy;
+import java.util.Random;
 
 import ch.backend.Handler;
+import ch.backend.objects.Ball;
+import ch.backend.objects.Bricks;
+import ch.backend.objects.GameObjects;
+import ch.backend.objects.Racket;
 
 public class Game extends Canvas implements Runnable {
 	
@@ -13,6 +21,25 @@ public class Game extends Canvas implements Runnable {
     private Thread thread;
     private boolean running = false;
     private Handler handler;
+    private int xMouse;
+    
+    public Game() {
+    	handler = new Handler(this);
+    	Random r = new Random();
+    	
+    	for (int i = 0; i<1; i++) {
+    		handler.addObject(new Ball(50, r.nextInt(Game.WIDTH),r.nextInt(Game.HEIGHT), handler));
+    	}
+    	handler.addObject(new Racket(handler));
+    	handler.addObject(new Bricks(100, handler));
+    	this.setBounds(new Rectangle(100, 100, WIDTH, HEIGHT));
+    	this.addMouseMotionListener(new MouseMotionAdapter(){
+            public void mouseMoved(MouseEvent e){
+                xMouse = e.getX();
+            
+            }
+        });
+    }
 
 	public synchronized void start(){
         thread = new Thread(this);
@@ -65,7 +92,7 @@ public class Game extends Canvas implements Runnable {
     }
 
     private void render(){
-        BufferStrategy bs = this.getBufferStrategy();
+    	BufferStrategy bs = this.getBufferStrategy();
         if(bs == null){
             this.createBufferStrategy(3);
             return;
@@ -93,6 +120,10 @@ public class Game extends Canvas implements Runnable {
 
     public static void main(String args[]){
         new Game();
+    }
+    
+    public int getXMouse() {
+    	return xMouse;
     }
 
 }
